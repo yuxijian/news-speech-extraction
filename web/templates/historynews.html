@@ -1,0 +1,124 @@
+{% extends 'layout.html' %}
+{% block title %}历史新闻{% endblock %}
+{% block body %}
+
+   <!-- Navigation -->
+  <nav class="navbar navbar-expand-lg navbar-light fixed-top py-3" id="mainNav">
+    <div class="container">
+      <a class="navbar-brand js-scroll-trigger" href="#page-top">News Extractor</a>
+      <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarResponsive">
+        <ul class="navbar-nav ml-auto my-2 my-lg-0">
+          <li class="nav-item">
+            <a class="btn btn-light btn-xl" href="/">Go Home!</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <section class="page-section bg-primary">
+    <div>
+          <h2 class="text-white mt-0">新华社新闻提取!</h2>
+          <table class="table table-hover" style="word-break:break-all; word-wrap:break-all;">
+              <thead>
+                <tr>
+                  <th style="width: 10%">ID</th>
+                  <th style="width: 10%">Author</th>
+                  <th style="width: 10%">Source</th>
+                  <th style="width: 50%">Feature</th>
+                  <th style="width: 10%">Title</th>
+                  <th style="width: 10%">Url</th>
+{#                  <th>Content</th>#}
+              </thead>
+              <tbody id="newsTableHtml">
+                {% for item in news %}
+                    <tr>
+                      <td>{{ item.id }}</td>
+                      <td>{{ item.author }}</td>
+                      <td>{{ item.source }}</td>
+{#                      <td>{{ item.content }}</td>#}
+                      <td>{{ item.feature }}</td>
+                      <td>{{ item.title }}</td>
+                      <td>{{ item.url }}</td>
+                    </tr>
+                {% endfor %}
+              </tbody>
+          </table>
+    <ul id="page"></ul>
+    </div>
+  </section>
+{% endblock %}
+
+{% block script %}
+<script>
+	$(function() {
+		var currentPage = {{ currentPage }};
+		var totalPages = {{ totalPages }};
+		$("#page").bootstrapPaginator({
+			bootstrapMajorVersion: 3, //对应的bootstrap版本
+			currentPage: currentPage, //当前页数
+			numberOfPages: 5, //每次显示页数
+			totalPages: totalPages, //总页数
+			shouldShowPage: true, //是否显示该按钮
+			useBootstrapTooltip: true,
+            alignment: "center",
+            itemTexts:function(type,page, current){//文字翻译可有可无
+	                    switch (type) {
+	                        case "first":
+	                            return "首页";
+	                        case "prev":
+	                            return "上一页";
+	                        case "next":
+	                            return "下一页";
+	                        case "last":
+	                            return "尾页";
+	                        case "page":
+	                            if(page == current){
+	                                return '<span style="color:red">&nbsp;'+page+'&nbsp;</span>'
+                                }else{
+	                                return '&nbsp;'+page+'&nbsp;';
+                                }
+	                    }
+	                },
+			onPageClicked: function(event, originalEvent, type, page) {
+			    window.location.href = "/news/get?pageNum="+page;
+				{#$.ajax({#}
+				{#		type: "post",#}
+				{#		dataType: "json",#}
+				{#		url: "/news/get",#}
+				{#		data: {"pageNum": page},#}
+				{#		success: function(data) {#}
+				{#		    $('#page').bootstrapPaginator({currentPage:page});#}
+				{#		    debugger;#}
+				{#			if(data.news != null){#}
+				{#			    drawTable(data.news)#}
+                {#            }#}
+				{#		},#}
+				{#		error: function(data) {#}
+				{#		    alert('unknown error!!')#}
+                {#        }#}
+				{#	});#}
+			}
+		});
+	});
+
+	function drawTable(data){
+	    debugger;
+        let newsTableHtml = '';
+        $.each(data,function(i,item) {
+                    newsTableHtml += '<tr>'+
+                            '<td>'+item.id+'</td>'+
+                            '<td>'+item.author+'</td>'+
+                            '<td>'+item.source+'</td>'+
+                            '<td>'+item.feature+'</td>'+
+                            '<td>'+item.title+'</td>'+
+                            '<td>'+item.url+'</td>'+
+                    '<tr>';
+                });
+                $("#newsTableHtml").html(newsTableHtml);
+    }
+</script>
+{% endblock %}
